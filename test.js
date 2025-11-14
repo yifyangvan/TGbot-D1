@@ -773,22 +773,25 @@ async function handleAdminRuleList(chatId, type, env) {
     }
     const listText = items.length === 0 ? "暂无项目" : items.map((item, i) => {
         if (type === "keyword_responses") {
-            return `${i + 1}. <code>${escapeHtml(item.keywords)}</code> → <code>${escapeHtml(item.response.substring(0, 30))}...</code> <a href="#" onclick="return false;">❌</a> <code>删除:${i}</code>`;
+            return `${i + 1}. <code>${escapeHtml(item.keywords)}</code> → <code>${escapeHtml(item.response.substring(0, 30))}...</code> [删除:${i}]`;
         } else {
-            return `${i + 1}. <code>${escapeHtml(item)}</code> <a href="#" onclick="return false;">❌</a> <code>删除:${i}</code>`;
+            return `${i + 1}. <code>${escapeHtml(item)}</code> [删除:${i}]`;
         }
     }).join('\n');
+
     const menuText = `
 <b>${title}</b>
 ---
 ${listText}
     `.trim();
+
     const keyboard = {
         inline_keyboard: items.map((_, i) => [{
             text: "删除",
             callback_data: `config:delete:${type}:${i}`
         }]).concat([[{ text: "返回", callback_data: `config:menu:${type === 'keyword_responses' ? 'autoreply' : 'keyword'}` }]])
     };
+
     const apiMethod = lastMsgId ? "editMessageText" : "sendMessage";
     const params = { chat_id: chatId, text: menuText, parse_mode: "HTML", reply_markup: keyboard };
     if (apiMethod === "editMessageText") params.message_id = lastMsgId;
